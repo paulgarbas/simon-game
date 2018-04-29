@@ -44,7 +44,7 @@
     border-bottom: 12.5px solid #000;
     border-right: 12.5px solid #000;
     border-radius: 100% 0 0 0;
-    background-color: green;
+    background-color: rgba(0, 128, 0, 0.7);
 }
 
 .up__right {
@@ -53,7 +53,7 @@
     border-bottom: 12.5px solid #000;
     border-left: 12.5px solid #000;
     border-radius: 0 100% 0 0;
-    background-color: red;
+    background-color: rgba(255, 0, 0, 0.7);
 }
 
 .bottom__left {
@@ -62,7 +62,7 @@
     border-top: 12.5px solid #000;
     border-right: 12.5px solid #000;
     border-radius: 0 0 0 100%;
-    background-color: yellow;
+    background-color: rgba(255, 255, 0, 0.7);
 }
 
 .bottom__right {
@@ -71,7 +71,7 @@
     border-top: 12.5px solid #000;
     border-left: 12.5px solid #000;
     border-radius: 0 0 100% 0;
-    background-color: blue;
+    background-color: rgba(0, 35, 150, 0.7);
 }
 
 .center {
@@ -106,14 +106,18 @@ h1 span {
     display: flex;
 }
 
-input[type="text"] {
+.display {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     width: 70px;
     height: 45px;
     border: none;
-    background-color: rgb(78, 48, 48);
+    background-color: rgba(78, 48, 48, 0.9);
     border: 3px solid rgba(0, 0, 0, 0.5);
-    outline: none;
     border-radius: 15%;
+    color: #ee3535;
+    font-weight: 700;
 }
 
 .start, .strict {
@@ -122,10 +126,83 @@ input[type="text"] {
     border: 3px solid rgba(0, 0, 0, 0.5);
     border-radius: 100%;
     background-color: red;
-    margin: 0 12px;
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+.start {
+    margin: 20px 20px 0 18px;
+}
+
+.start:hover, .strict:hover {
+    cursor: pointer;
+}
+
+.strict-alert {
+    text-align: center;
+}
+
+.alert {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border: 1px solid rgb(0, 0, 0);
+    background-color: rgb(0, 0, 0);
+    border-radius: 100%;
 }
 
 .strict {
     border: 3px solid rgba(0, 0, 0, 0.7);
     background-color: yellow;
+    margin: 2px auto 0 auto;
 }
+
+.count-name, .start-name, .strict-name {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.on-off-block {
+    display: flex;
+    align-items: center;
+}
+
+.on-off-block span {
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.on-off {
+    display: flex;
+    width: 55px;
+    height: 23px;
+    background-color: rgb(0, 0, 0);
+    margin: 15px 5px;
+}
+
+.on-off:hover {
+    cursor: pointer;
+}
+
+/* .off, .on {
+    display: inline-block;
+} */
+
+.off {
+    width: 50%;
+    height: 100%;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(141, 141, 236);
+    border-radius: 5px;
+}
+
+.on {
+    width: 50%;
+    height: 100%;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(141, 141, 236);
+    border-radius: 5px;
+    visibility: hidden;
+}
+

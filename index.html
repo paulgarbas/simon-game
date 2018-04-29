@@ -7,6 +7,11 @@
     <title>Simon Game</title>
     <link rel="stylesheet" href="css/bootstrap-grid.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+    </script>
 </head>
 <body>
     <main>
@@ -18,9 +23,27 @@
                             <div class="center__inner">
                                 <h1>Simon<span>&reg;</span></h1>
                                 <div class="controls">
-                                    <input type="text">
-                                    <div class="start"></div>
-                                    <div class="strict"></div>
+                                    <div>
+                                        <div class="display"></div>
+                                        <div class="count-name">Count</div>
+                                    </div>
+                                    <div class="start-block">
+                                        <div class="start"></div>
+                                        <div class="start-name">Start</div>
+                                    </div>
+                                    <div class="strict-alert">
+                                        <div class="alert"></div>
+                                        <div class="strict"></div>
+                                        <div class="strict-name">Strict</div>
+                                    </div>
+                                </div>
+                                <div class="on-off-block">
+                                    <span>Off</span>
+                                    <div class="on-off">
+                                        <div class="off"></div>
+                                        <div class="on"></div>
+                                    </div>
+                                    <span>On</span>
                                 </div>
                             </div>
                         </div>
