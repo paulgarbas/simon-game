@@ -1,8 +1,9 @@
 "use strict";
 
 $(document).ready(function() {
-    let space, dashes, number, clicked;
+    let space, dashes, number, clicked, randomNumber, quarter;
     let turnedOn = false;
+    let playerClicked = false;
     let nr = 1;
     let audio1 = new Audio('sounds/simonSound1.mp3');
     let audio2 = new Audio('sounds/simonSound2.mp3');
@@ -37,6 +38,9 @@ $(document).ready(function() {
             // Dashes disappear and number appears
             dashesDissapear();
             turnedOn = false;
+            // Number resets
+            nr = 1;
+            number = "0" + nr;
         }
     }
 
@@ -66,6 +70,9 @@ $(document).ready(function() {
     function start() {
         dashesDissapear();
         let count = 0;
+        // Number resets
+        nr = 1;
+        number = "0" + nr;
         if (turnedOn) {
             space = setInterval(function() {
                 if (count !== 3) {
@@ -89,12 +96,15 @@ $(document).ready(function() {
     }
 
     function computer() {
-        let number = "0" + nr;
-        $(".display").text(number);
+        playerClicked = false;
+        number = "0" + nr;
+        let twoDigits = number.slice(-2);
+        $(".display").text(twoDigits);
         randomQuarter();
-        // nr++;
+        console.log(randomNumber);
+        nr++;
+        player();
     }
-    player();
 
     function player() {
         // Player can hover on quarters
@@ -106,16 +116,27 @@ $(document).ready(function() {
         }
         // Recognizes which quarter was clicked
         $(".up__left, .up__right, .bottom__left, .bottom__right").click(function(event){
-            clicked = event.target.className;
-            console.log(event.target.className);
-            lightAndSound(clicked === "up__left", clicked === "up__right", clicked === "bottom__left", clicked === "bottom__right");
+            if (!playerClicked) {
+                clicked = event.target.className;
+                console.log(event.target.className);
+                lightAndSound(clicked === "up__left", clicked === "up__right", clicked === "bottom__left", clicked === "bottom__right");
+                if (randomNumber === 0 && clicked === "up__left" ||
+                    randomNumber === 1 && clicked === "up__right" ||
+                    randomNumber === 2 && clicked === "bottom__left" ||
+                    randomNumber === 3 && clicked === "bottom__right") {
+                        console.log("Paspaudei ta pati!");
+                        playerClicked = true;
+                        setTimeout(function() {
+                            computer();
+                        }, 2000)
+                }
+            }
         });
-        // computer();
     }
     
     // Random quarter with light and sound
     function randomQuarter() {
-        let randomNumber = Math.floor(Math.random() * 4);
+        randomNumber = Math.floor(Math.random() * 4);
         lightAndSound(randomNumber === 0, randomNumber === 1, randomNumber === 2, randomNumber === 3);
     }
     
@@ -133,18 +154,21 @@ $(document).ready(function() {
             setTimeout(function() {
                 $(".up__right").css("background-color", "rgba(255, 0, 0, 0.7)");
             }, 500);
+            quarter = "rightUp";            
         } else if (condition3) {
             $(".bottom__left").css("background-color", "rgb(255, 255, 0)");
             audio3.play();
             setTimeout(function() {
                 $(".bottom__left").css("background-color", "rgba(255, 255, 0, 0.7)");
             }, 500);
+            quarter = "leftBottom";            
         } else if (condition4) {
             $(".bottom__right").css("background-color", "rgb(40, 87, 239)");
             audio4.play();
             setTimeout(function() {
                 $(".bottom__right").css("background-color", "rgba(0, 35, 150, 0.7)");
             }, 500);
+            quarter = "rightBottom";            
         }
     }
 
