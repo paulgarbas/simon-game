@@ -2,10 +2,14 @@
 
 $(document).ready(function() {
     let space, dashes, number, clicked, randomNumber; 
+    let timeouts = [];
     let turnedOn = false;
+    let strictClicked = false;
+    let playersTurn = false;
     let playerClicked = false;
     let repeatedClick = false;
     let clickedWrong = false;
+    let winner = false;
     let nr = 1;
     let delay = 0;
     let randomNumberArray = [];
@@ -20,13 +24,18 @@ $(document).ready(function() {
 
     // Start button
     $(".start").click(start);
+
+    // Strict button
+    $(".strict").click(strict);
     
 
     // FUNCTIONS
 
     // Turns game on/off
     function turnOnOff() {
-        // If game is turned off, turn it on
+        clearTimeouts();
+        timeouts = [];
+        // If game is turned off, turns it on
         if (!turnedOn) {
             // Show appropriate blue button
             $(".off").css("visibility", "hidden");
@@ -35,7 +44,7 @@ $(document).ready(function() {
             $(".display").css("font-size", "40px");
             $(".display").text("- -");
             turnedOn = true;
-        // If game is turned on, turn it off
+        // If game is turned on, turns it off
         } else {
             // Show appropriate blue button
             $(".off").css("visibility", "visible");
@@ -43,6 +52,11 @@ $(document).ready(function() {
             // Dashes disappear and number appears
             dashesDissapear();
             turnedOn = false;
+            winner = false;
+            repeatedClick = false;
+            // Strict button's light turns off
+            $(".alert").css("background-color", "rgb(0,0,0)");  
+            strictClicked = false;
             // Number resets
             nr = 1;
             number = "0" + nr;
@@ -54,8 +68,7 @@ $(document).ready(function() {
         // Dashes disappear
         clearInterval(space);
         clearInterval(dashes);
-        // Number appears
-        clearTimeout(number);
+     
         $(".display").text("");
         $(".display").css("align-items", "flex-end");
 
@@ -73,12 +86,19 @@ $(document).ready(function() {
     
     // Starts game
     function start() {
-        randomNumberArray = [];
-        dashesDissapear();
+        clearTimeouts();
+        timeouts = [];
+        repeatedClick = false;
+        
+        $(".display").css("align-items", "center");        
+        if (strictClicked && clickedWrong || !strictClicked && !clickedWrong || strictClicked && !clickedWrong) {
+            randomNumberArray = [];
+            // Number resets
+            nr = 1;
+            number = "0" + nr;
+        }
         let count = 0;
-        // Number resets
-        nr = 1;
-        number = "0" + nr;
+        dashesDissapear();
         if (turnedOn) {
             space = setInterval(function() {
                 if (count !== 3) {
@@ -90,104 +110,179 @@ $(document).ready(function() {
             
             dashes = setInterval(function() {
                 if (count !== 2) {
-                    $(".display").text("- -");
+                    if (!winner) {
+                        $(".display").text("- -");
+                        $(".display").css("font-size", "40px");                                                                                                                                       
+                    } else {
+                        $(".display").text("win");   
+                        $(".display").css("align-items", "end");   
+                        $(".display").css("font-size", "35px");                                                                                                               
+                    }
                 } else {
                     clearInterval(dashes);
-                    $(".display").css("align-items", "center");
-                    computer();
+                    if (!winner) {
+                        $(".display").css("align-items", "center");
+                        $(".display").css("font-size", "40px");                                                                                                                                       
+                        computer();
+                    } else {
+                        $(".display").text("win");                                                   
+                        $(".display").css("align-items", "end");
+                        $(".display").css("font-size", "35px");                                                                                                                                       
+                        winner = false;         
+                    }
                 }
                 count++;
             }, 600);
         }
     }
 
+    // Clicked strict button
+    function strict() {
+        if (turnedOn) {
+            // Light turns on/off
+            if (!strictClicked) {
+                $(".alert").css("background-color", "rgb(255,0,0)");
+                strictClicked = true;
+            } else {
+                $(".alert").css("background-color", "rgb(0,0,0)");   
+                strictClicked = false;         
+            }
+        }
+    }
+
+    // Computer's turn
     function computer() {
         playerClicked = false;
-        clickedWrong = false;
         let delay = 1;
         number = "0" + nr;
         let twoDigits = number.slice(-2);
         $(".display").text(twoDigits);
-        if (repeatedClick) {
-            //Pakartok visus pasirinkimus plius padaryk viena nauja pasirinkima
-            for (let i = 0; i < randomNumberArray.length; i++) {
-                delay++;
-                setTimeout(function() {
-                    lightAndSound(randomNumberArray[i] === 0, randomNumberArray[i] === 1, randomNumberArray[i] === 2, randomNumberArray[i] === 3);
-                    console.log('Pakartorinis', randomNumberArray[i]);
-                }, delay * 1000);
-            }
         
-            function playRandomQuarter() { 
-                return new Promise(function (resolve, reject) { 
-                    setTimeout(function () { 
-                        resolve(randomQuarter());
-                        console.log('Einantis po pakartotinio, random', randomNumber);              
-                    }, (delay + 1) * 1000);
-                });
-            }
+        // If player still doesn't reach 20 correct clicks in a row
+        if (number !== "21") {
             
-            function playerTurn() { 
-                return new Promise(function (resolve, reject) { 
-                    resolve(player());
+            // If player's clicks are correct
+            if (repeatedClick) {
+                // Computer repeats all quarters
+                for (let i = 0; i < randomNumberArray.length; i++) {
+                    delay++;
+                    let repeatingQuartersTimeout = setTimeout(function() {
+                        lightAndSound(randomNumberArray[i] === 0, randomNumberArray[i] === 1, randomNumberArray[i] === 2, randomNumberArray[i] === 3);
+                    }, delay * 800);
+                    timeouts.push(repeatingQuartersTimeout);                     
+                }
+            
+                // Plus computer clicks one new quarter
+                function playRandomQuarter() { 
+                    return new Promise(function (resolve, reject) { 
+                        let randomQuarterTimeout = setTimeout(function () { 
+                            resolve(randomQuarter());            
+                        }, (delay + 1) * 800);
+                        timeouts.push(randomQuarterTimeout);                     
+                    });
+                }
+                
+                function playerTurn() { 
+                    return new Promise(function (resolve, reject) { 
+                        resolve(player());
+                    });
+                }
+                
+                // Waits after all quarters are clicked, then player can choose where to click
+                playRandomQuarter().then(function (result) {
+                    return playerTurn();
                 });
+                
+            } else {
+                if (strictClicked && clickedWrong || !strictClicked && !clickedWrong || strictClicked && !clickedWrong) {
+                    clickedWrong = false;
+                    randomQuarter();               
+                    player();
+                } else {
+                    clearTimeouts();
+                    clickedWrong = false;
+                    delay = 1;
+                    
+                    let firstRepeatTimeout = setTimeout(function() {
+                        lightAndSound(randomNumberArray[0] === 0, randomNumberArray[0] === 1, randomNumberArray[0] === 2, randomNumberArray[0] === 3);                    
+                    }, 500);
+                    timeouts.push(firstRepeatTimeout);                                         
+                    
+                    // Computer repeats all quarters
+                    for (let i = 1; i < randomNumberArray.length; i++) {
+                        delay++;
+                        let repeatingQuartersTimeout = setTimeout(function() {
+                            lightAndSound(randomNumberArray[i] === 0, randomNumberArray[i] === 1, randomNumberArray[i] === 2, randomNumberArray[i] === 3);
+                        }, delay * 800);
+                        timeouts.push(repeatingQuartersTimeout);                                         
+                    }
+                    
+                    // Player's turn
+                    let playersTurnTimeout = setTimeout(function() {
+                        player();
+                    }, (delay + 1) * 800);                  
+                }
             }
-            playRandomQuarter().then(function (resultFromB) {
-                return playerTurn();
-            });
+            nr++;   
+        
+        // If player reaches 20 correct click in a row, he wins
         } else {
-            randomQuarter();
-            console.log("Random number", randomNumber);
-            player();
+            winner = true;
+            playerClicked = true;
+            start();
         }
-        nr++;
     }
 
+    // Player's turn
     function player() {
+        playersTurn = true;
         // Player can hover on quarters
-        let names = [".up__left", ".up__right", ".bottom__left", ".bottom__right"];
-        for (let i = 0; i < names.length; i++) {
-            $(names[i]).hover(function() {
-                $(this).css("cursor", "pointer");
-            });
-        }
+        changeCursor();
+        
         let newRandomNumberArray = randomNumberArray.slice();
-        console.log("newRandomNumberarray ilgis yra: ", newRandomNumberArray.length + ", su siomis reiksmemis: " + newRandomNumberArray);
         // Recognizes which quarter was clicked
         $(".up__left, .up__right, .bottom__left, .bottom__right").off('click').click(function(event){
             event.stopPropagation();
             if (!playerClicked) {
                 clicked = event.target.className;
-                console.log("As paspaudziau", event.target.className);
                 
                 for (let i = 0; i < newRandomNumberArray.length; i++) {
                     if (newRandomNumberArray[i] === 0 && clicked === "up__left" ||
                         newRandomNumberArray[i] === 1 && clicked === "up__right" ||
                         newRandomNumberArray[i] === 2 && clicked === "bottom__left" ||
                         newRandomNumberArray[i] === 3 && clicked === "bottom__right") {
-                        console.log("Paspaudei ta pati!");
+                
                         lightAndSound(clicked === "up__left", clicked === "up__right", clicked === "bottom__left", clicked === "bottom__right");
                         newRandomNumberArray.shift();
-                        console.log("newRandomNumberarray ilgis yra: ", newRandomNumberArray.length + ", su siomis reiksmemis: " + newRandomNumberArray);
-                        console.log("randomNumberArray yra ilgis yra: ", randomNumberArray.length + ", su siomis reiksmemis: " + randomNumberArray);
+                        
                         if (newRandomNumberArray.length === 0) {
-                            console.log("Masyvas tapo 0");
                             playerClicked = true;
                             repeatedClick = true;
-                            setTimeout(function() {
+                            let computersTurnTimeout = setTimeout(function() {
+                                playersTurn = false;
+                                // Player can't hover on quarters
+                                changeCursor();
                                 computer();
-                            }, 2000);
+                            }, 500);
+                            timeouts.push(computersTurnTimeout);         
+                            
                         }
                     } else {
                         playerClicked = true;
                         repeatedClick = false;
                         clickedWrong = true;
+                        
                         lightAndSound(clicked === "up__left", clicked === "up__right", clicked === "bottom__left", clicked === "bottom__right");      
                         wrongSound.play();  
-                        console.log("Ne ta paspaudei!");
-                        setTimeout(function() {
+                        
+                        let redirectToStartTimeout = setTimeout(function() {
+                            playersTurn = false;
+                            // Player can't hover on quarters
+                            changeCursor();
+                            nr--;
                             start();
-                        }, 2000);
+                        }, 500);
+                        timeouts.push(redirectToStartTimeout);                                 
                     }
                     break;
                 }
@@ -209,7 +304,7 @@ $(document).ready(function() {
             if (!clickedWrong) {
                 audio1.play();
             }
-            setTimeout(function() {
+            let leftUpTimeout = setTimeout(function() {
                 $(".up__left").css("background-color", "rgba(0, 128, 0, 0.7)");
             }, 500);
         } else if (condition2) {
@@ -217,7 +312,7 @@ $(document).ready(function() {
             if (!clickedWrong) {
                 audio2.play();
             }
-            setTimeout(function() {
+            let rightUpTimeout = setTimeout(function() {
                 $(".up__right").css("background-color", "rgba(255, 0, 0, 0.7)");
             }, 500);            
         } else if (condition3) {
@@ -225,7 +320,7 @@ $(document).ready(function() {
             if (!clickedWrong) {
                 audio3.play();
             }
-            setTimeout(function() {
+            let leftBottomTimeout = setTimeout(function() {
                 $(".bottom__left").css("background-color", "rgba(255, 255, 0, 0.7)");
             }, 500);           
         } else if (condition4) {
@@ -233,9 +328,28 @@ $(document).ready(function() {
             if (!clickedWrong) {
                 audio4.play();
             }
-            setTimeout(function() {
+            let rightBottomTimeout = setTimeout(function() {
                 $(".bottom__right").css("background-color", "rgba(0, 35, 150, 0.7)");
             }, 500);            
+        }
+    }
+
+    // Player's ability to hover on quarters    
+    function changeCursor() {
+        let names = [".up__left", ".up__right", ".bottom__left", ".bottom__right"];
+        for (let i = 0; i < names.length; i++) {
+            if (playersTurn) {
+                $(names[i]).css("cursor", "pointer");
+            } else {
+                $(names[i]).css("cursor", "default");                                
+            }
+        }
+    }
+
+    // Clears all Timeouts
+    function clearTimeouts() {
+        for (let i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
         }
     }
 });

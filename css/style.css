@@ -2,6 +2,13 @@
     box-sizing: border-box;
 }
 
+body {
+    padding: 100px 0;
+    background: url("../background.jpeg") no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
 .col-sm {
     display: flex;
     justify-content: center;
@@ -145,7 +152,7 @@ h1 span {
     display: inline-block;
     width: 9px;
     height: 9px;
-    border: 1px solid rgb(0, 0, 0);
+    border: 2px solid rgb(0, 0, 0);
     background-color: rgb(0, 0, 0);
     border-radius: 100%;
 }
@@ -185,10 +192,6 @@ h1 span {
     cursor: pointer;
 }
 
-/* .off, .on {
-    display: inline-block;
-} */
-
 .off {
     width: 50%;
     height: 100%;
@@ -206,3 +209,31 @@ h1 span {
     visibility: hidden;
 }
 
+/* Media Queries */
+
+@media only screen and (max-width : 768px) {
+    .frame {
+        width: 400px;
+        height: 400px;
+        padding: 10px;
+    }
+}
+
+@media only screen and (max-width : 480px) {
+    .frame {
+        width:300px;
+        height:600px;
+        padding: 0px;
+        border-radius: 0;
+    }
+
+    .center {
+        padding: 5px;
+        border-radius: 0;
+    }   
+
+    .center__inner, .up__left, .up__right, .bottom__left, .bottom__right {
+        border-radius: 0;
+        border: 0;
+    }
+}
