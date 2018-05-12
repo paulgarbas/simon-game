@@ -159,7 +159,7 @@ $(document).ready(function() {
         $(".display").text(twoDigits);
         
         // If player still doesn't reach 20 correct clicks in a row
-        if (number !== "21") {
+        if (number !== "021") {
             
             // If player's clicks are correct
             if (repeatedClick) {
